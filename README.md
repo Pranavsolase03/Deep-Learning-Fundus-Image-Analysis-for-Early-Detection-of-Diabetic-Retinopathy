@@ -22,6 +22,7 @@ A full-stack web application for detecting diabetic retinopathy using deep learn
 - Flask (Python web framework)
 - SQLite (Database)
 - TensorFlow/Keras (Deep Learning)
+- Download Trained Model - https://drive.google.com/file/d/1c8QgRM2PoKXVe5YZxVbO3ysKGj_jWQCP/view?usp=sharing
 
 ## Installation
 
@@ -133,3 +134,4 @@ This project is for educational purposes.
 ## Author
 
 Developed for college project
+
