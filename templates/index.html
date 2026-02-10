@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diabetic Retinopathy Detection System</title>
+    <meta name="description" content="AI-powered diabetic retinopathy detection using advanced deep learning">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Custom Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#6366f1',
+                        secondary: '#8b5cf6',
+                        accent: '#ec4899',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .hover-scale {
+            transition: transform 0.3s ease;
+        }
+        
+        .hover-scale:hover {
+            transform: scale(1.05);
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .loading-spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid white;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .preview-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 1rem;
+        }
+        
+        .preview-container img {
+            transition: transform 0.3s ease;
+        }
+        
+        .preview-container:hover img {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen text-white">
+    
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass-effect">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <svg class="w-8 h-8 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                    </svg>
+                    <span class="text-xl font-bold">DR Detection</span>
+                </div>
+                
+                <div id="navButtons" class="flex items-center space-x-4">
+                    <!-- Will be populated by JS -->
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="pt-24 pb-12 px-4">
+        <div class="max-w-7xl mx-auto">
+            
+            <!-- Auth Section (Login/Register) -->
+            <div id="authSection" class="hidden">
+                <div class="max-w-md mx-auto">
+                    <div class="text-center mb-8 fade-in">
+                        <h1 class="text-5xl font-bold mb-4 gradient-text">Welcome</h1>
+                        <p class="text-gray-300 text-lg">AI-Powered Diabetic Retinopathy Detection</p>
+                    </div>
+                    
+                    <!-- Tabs -->
+                    <div class="flex mb-6 glass-effect rounded-lg p-1">
+                        <button id="loginTab" class="flex-1 py-3 rounded-md transition-all duration-300 font-semibold" onclick="switchTab('login')">
+                            Login
+                        </button>
+                        <button id="registerTab" class="flex-1 py-3 rounded-md transition-all duration-300 font-semibold" onclick="switchTab('register')">
+                            Register
+                        </button>
+                    </div>
+                    
+                    <!-- Login Form -->
+                    <div id="loginForm" class="glass-effect p-8 rounded-2xl shadow-2xl fade-in">
+                        <h2 class="text-2xl font-bold mb-6">Sign In</h2>
+                        <form onsubmit="handleLogin(event)">
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-2">Username</label>
+                                <input type="text" id="loginUsername" required
+                                    class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+                            </div>
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium mb-2">Password</label>
+                                <input type="password" id="loginPassword" required
+                                    class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+                            </div>
+                            <button type="submit" class="w-full gradient-bg py-3 rounded-lg font-semibold hover-scale shadow-lg">
+                                Sign In
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <!-- Register Form -->
+                    <div id="registerForm" class="glass-effect p-8 rounded-2xl shadow-2xl fade-in hidden">
+                        <h2 class="text-2xl font-bold mb-6">Create Account</h2>
+                        <form onsubmit="handleRegister(event)">
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-2">Username</label>
+                                <input type="text" id="registerUsername" required
+                                    class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-2">Email</label>
+                                <input type="email" id="registerEmail" required
+                                    class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+                            </div>
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium mb-2">Password</label>
+                                <input type="password" id="registerPassword" required minlength="6"
+                                    class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+                            </div>
+                            <button type="submit" class="w-full gradient-bg py-3 rounded-lg font-semibold hover-scale shadow-lg">
+                                Create Account
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Dashboard Section -->
+            <div id="dashboardSection" class="hidden">
+                <div class="text-center mb-12 fade-in">
+                    <h1 class="text-5xl font-bold mb-4">
+                        <span class="gradient-text">Diabetic Retinopathy</span> Detection
+                    </h1>
+                    <p class="text-gray-300 text-lg max-w-2xl mx-auto">
+                        Upload a retinal fundus image to detect diabetic retinopathy using our advanced AI model
+                    </p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8 mb-12">
+                    <!-- Upload Section -->
+                    <div class="glass-effect p-8 rounded-2xl shadow-2xl fade-in">
+                        <h2 class="text-2xl font-bold mb-6 flex items-center">
+                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            Upload Image
+                        </h2>
+                        
+                        <div class="mb-6">
+                            <label for="imageUpload" class="block w-full cursor-pointer">
+                                <div class="border-2 border-dashed border-white/30 rounded-xl p-12 text-center hover:border-indigo-500 transition-all hover-scale">
+                                    <svg class="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                    </svg>
+                                    <p class="text-lg font-semibold mb-2">Click to upload</p>
+                                    <p class="text-sm text-gray-400">PNG, JPG up to 10MB</p>
+                                </div>
+                            </label>
+                            <input type="file" id="imageUpload" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+                        </div>
+                        
+                        <!-- Image Preview -->
+                        <div id="imagePreview" class="hidden mb-6">
+                            <div class="preview-container">
+                                <img id="previewImg" src="" alt="Preview" class="w-full rounded-xl">
+                            </div>
+                        </div>
+                        
+                        <button id="analyzeBtn" onclick="analyzImage()" disabled
+                            class="w-full gradient-bg py-3 rounded-lg font-semibold hover-scale shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                            Analyze Image
+                        </button>
+                    </div>
+                    
+                    <!-- Results Section -->
+                    <div class="glass-effect p-8 rounded-2xl shadow-2xl fade-in">
+                        <h2 class="text-2xl font-bold mb-6 flex items-center">
+                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                            Results
+                        </h2>
+                        
+                        <div id="resultsContent" class="text-center text-gray-400 py-12">
+                            <svg class="w-20 h-20 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            <p>Upload and analyze an image to see results</p>
+                        </div>
+                        
+                        <div id="loadingContent" class="hidden text-center py-12">
+                            <div class="loading-spinner mx-auto mb-4"></div>
+                            <p class="text-lg">Analyzing image...</p>
+                        </div>
+                        
+                        <div id="predictionResults" class="hidden">
+                            <!-- Results will be populated here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- History Section -->
+                <div class="glass-effect p-8 rounded-2xl shadow-2xl fade-in">
+                    <h2 class="text-2xl font-bold mb-6 flex items-center">
+                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Recent Predictions
+                    </h2>
+                    <div id="historyContent">
+                        <!-- History will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
