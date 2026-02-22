@@ -1,7 +1,7 @@
 # Diabetic Retinopathy Detection System
 
 A full-stack web application for detecting diabetic retinopathy using deep learning (Xception CNN model).
-
+Demo video - https://drive.google.com/file/d/1MlPl27kWTy9p5cez7IjQ2aTrYPXRYFlA/view?usp=sharing
 ## Features
 
 - 🔐 **User Authentication**: Secure login and registration with SQLite database
@@ -134,4 +134,5 @@ This project is for educational purposes.
 ## Author
 
 Developed for college project
+
 
